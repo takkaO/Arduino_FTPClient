@@ -31,6 +31,7 @@ class ESP32_FTPClient
   unsigned char clientBuf[1500];
   size_t bufferSize = 1500;
   uint16_t timeout = 10000;
+  uint16_t _lastResponseCode = 0;
   WiFiClient* GetDataClient();
   
   public:
@@ -55,4 +56,6 @@ class ESP32_FTPClient
   void ContentListWithListCommand(const char * dir, String * list);
   void DownloadString(const char * filename, String &str);
   void DownloadFile(const char * filename, unsigned char * buf, size_t length, bool printUART = false);
+  void getFileStatus(const char * fpath, char * result = NULL);
+  uint16_t getLastResponseCode();
 };

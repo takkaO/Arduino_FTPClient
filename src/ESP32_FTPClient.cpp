@@ -62,12 +62,12 @@ void ESP32_FTPClient::WriteClientBuffered(WiFiClient* cli, unsigned char * data,
 
 void ESP32_FTPClient::GetFTPAnswer (char* result, int offsetStart) {
   char thisByte;
-  outCount = 0;
 
   unsigned long _m = millis();
   while (!client.available() && millis() < _m + timeout) delay(1);
 
   if( !client.available()){
+    outCount = 0;
     memset( outBuf, 0, sizeof(outBuf) );
     strcpy( outBuf, "Offline");
 
@@ -82,6 +82,11 @@ void ESP32_FTPClient::GetFTPAnswer (char* result, int offsetStart) {
       outBuf[outCount] = thisByte;
       outCount++;
       outBuf[outCount] = 0;
+    }
+    if (thisByte == '\n') {
+      _lastResponseCode = atoi(outBuf);
+      outCount = 0;
+      break;
     }
   }
 
@@ -144,21 +149,35 @@ void ESP32_FTPClient::OpenConnection() {
     FTPdbgn(F("Command connected"));
   }
   
-  GetFTPAnswer();
+  // clear buffer
+  while (client.available()) {
+    client.read();
+  }
+  uint16_t response_code = 0;
 
   FTPdbgn("Send USER");
   client.print(F("USER "));
   client.println(F(userName));
   GetFTPAnswer();
+  while (client.available()) {
+    GetFTPAnswer();
+  }
 
   FTPdbgn("Send PASSWORD");
   client.print(F("PASS "));
   client.println(F(passWord));
   GetFTPAnswer();
+  while (client.available()) {
+    GetFTPAnswer();
+  }
+
   
   FTPdbgn("Send SYST");
   client.println(F("SYST"));
   GetFTPAnswer();
+  while (client.available()) {
+    GetFTPAnswer();
+  }
 }
 
 void ESP32_FTPClient::RenameFile(char* from, char* to) {
@@ -277,6 +296,10 @@ void ESP32_FTPClient::ContentList(const char * dir, String * list) {
       //FTPdbgn(String(_b) + ":" + list[_b]);
       _b++;
     }
+    else {
+      // too many files
+      return;
+    }
   }
 
 }
@@ -308,6 +331,10 @@ void ESP32_FTPClient::ContentListWithListCommand(const char * dir, String * list
       list[_b] = tmp.substring(tmp.lastIndexOf(" ") + 1, tmp.length());
       //FTPdbgn(String(_b) + ":" + tmp);
       _b++;
+    }
+    else {
+      // too many files
+      return;
     }
   }
 
@@ -360,4 +387,39 @@ void ESP32_FTPClient::DownloadFile(const char * filename, unsigned char * buf, s
       }
     }
   }
+}
+
+void ESP32_FTPClient::getFileStatus(const char * fpath, char * result) {
+  FTPdbgn("Send STAT");
+  if(!isConnected()) return;
+  client.print(F("STAT "));
+  client.println(F(fpath));
+
+  char _resp[ sizeof(outBuf) ];
+
+  String _result = "";
+  bool _isComplete = false;
+  while (isConnected() && _isComplete == false) {
+    GetFTPAnswer(_resp);
+    _result += _resp;
+    if (_result.lastIndexOf("End.") != -1) {
+      _isComplete = true;
+    }
+  }
+
+  if (_isComplete == false) {
+    _result = "";
+    return;
+  }
+
+  if (result != NULL) {
+    memcpy(result, _result.c_str(), _result.length());
+  }
+  else {
+    Serial.print(_result);
+  }
+}
+
+uint16_t ESP32_FTPClient::getLastResponseCode() {
+  return _lastResponseCode;
 }
