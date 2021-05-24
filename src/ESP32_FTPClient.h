@@ -56,6 +56,7 @@ class ESP32_FTPClient
   void ContentListWithListCommand(const char * dir, String * list);
   void DownloadString(const char * filename, String &str);
   void DownloadFile(const char * filename, unsigned char * buf, size_t length, bool printUART = false);
-  void getFileStatus(const char * fpath, char * result = NULL);
+  void getFileStatus(const char * fpath);
+  void getFileStatus(const char * fpath, String * result);
   uint16_t getLastResponseCode();
 };

@@ -90,7 +90,7 @@ void ESP32_FTPClient::GetFTPAnswer (char* result, int offsetStart) {
     }
   }
 
-  if(outBuf[0] == '4' || outBuf[0] == '5' ){
+  if(400 <= _lastResponseCode){
     _isConnected = false;
     isConnected();
     return;
@@ -389,7 +389,13 @@ void ESP32_FTPClient::DownloadFile(const char * filename, unsigned char * buf, s
   }
 }
 
-void ESP32_FTPClient::getFileStatus(const char * fpath, char * result) {
+void ESP32_FTPClient::getFileStatus(const char * fpath) {
+  String _result = "";
+  getFileStatus(fpath, &_result);
+  Serial.print(_result);
+}
+
+void ESP32_FTPClient::getFileStatus(const char * fpath, String * result) {
   FTPdbgn("Send STAT");
   if(!isConnected()) return;
   client.print(F("STAT "));
@@ -397,26 +403,19 @@ void ESP32_FTPClient::getFileStatus(const char * fpath, char * result) {
 
   char _resp[ sizeof(outBuf) ];
 
-  String _result = "";
+  *result = "";
   bool _isComplete = false;
   while (isConnected() && _isComplete == false) {
     GetFTPAnswer(_resp);
-    _result += _resp;
-    if (_result.lastIndexOf("End.") != -1) {
+    *result += _resp;
+    if (result->lastIndexOf("End.") != -1) {
       _isComplete = true;
     }
   }
 
   if (_isComplete == false) {
-    _result = "";
+    *result = "";
     return;
-  }
-
-  if (result != NULL) {
-    memcpy(result, _result.c_str(), _result.length());
-  }
-  else {
-    Serial.print(_result);
   }
 }
 
