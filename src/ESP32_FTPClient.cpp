@@ -153,7 +153,6 @@ void ESP32_FTPClient::OpenConnection() {
   while (client.available()) {
     client.read();
   }
-  uint16_t response_code = 0;
 
   FTPdbgn("Send USER");
   client.print(F("USER "));
