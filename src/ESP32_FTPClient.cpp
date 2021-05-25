@@ -179,7 +179,7 @@ void ESP32_FTPClient::OpenConnection() {
   }
 }
 
-void ESP32_FTPClient::RenameFile(char* from, char* to) {
+void ESP32_FTPClient::RenameFile(const char* from, const char* to) {
   FTPdbgn("Send RNFR");
   if(!isConnected()) return;
   client.print(F("RNFR "));
@@ -210,6 +210,10 @@ void ESP32_FTPClient::InitFile(const char* type){
   FTPdbgn("Send PASV");
   client.println(F("PASV"));
   GetFTPAnswer();
+
+  if (isConnected() && getLastResponseCode() != 227) {
+    GetFTPAnswer();
+  }
 
   char *tStr = strtok(outBuf, "(,");
   int array_pasv[6];
@@ -404,15 +408,25 @@ void ESP32_FTPClient::getFileStatus(const char * fpath, String * result) {
 
   *result = "";
   bool _isComplete = false;
+  uint8_t count = 0;
   while (isConnected() && _isComplete == false) {
     GetFTPAnswer(_resp);
     *result += _resp;
-    if (result->lastIndexOf("End.") != -1) {
-      _isComplete = true;
+    if (getLastResponseCode() == 213) {
+      count++;
+      if (count != 2) {
+        _lastResponseCode = 0;
+      }
+      else {
+        _isComplete = true;
+      }
     }
   }
 
   if (_isComplete == false) {
+    Serial.println("STAT Failed BEGIN ~~~");
+    Serial.println(*result);
+    Serial.println("STAT Failed END ~~~");
     *result = "";
     return;
   }
@@ -420,4 +434,10 @@ void ESP32_FTPClient::getFileStatus(const char * fpath, String * result) {
 
 uint16_t ESP32_FTPClient::getLastResponseCode() {
   return _lastResponseCode;
+}
+
+void ESP32_FTPClient::clearBuffer() {
+  while (client.available()) {
+    Serial.println(client.read());
+  }
 }
