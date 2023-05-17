@@ -14,12 +14,12 @@ Distributed as-is; no warranty is given.
 #include <WiFi.h>
 #include <WiFiClient.h>
 
-#define WIFI_SSID "ASUS_image"
-#define WIFI_PASS "0236443222"
+#define WIFI_SSID ""
+#define WIFI_PASS ""
 
-char ftp_server[] = "192.168.0.220";
-char ftp_user[]   = "admin";
-char ftp_pass[]   = "admin";
+char ftp_server[] = "";
+char ftp_user[]   = "";
+char ftp_pass[]   = "";
 
 // you can pass a FTP timeout and debbug mode on the last 2 arguments
 Arduino_FTPClient ftp(ftp_server, ftp_user, ftp_pass, 5000, 2);
