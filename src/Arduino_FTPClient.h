@@ -60,6 +60,7 @@ public:
 
 	void setAccount(String _userName, String _password);
 	void setTimeout(uint16_t _timeout);
+	void setVerbose(uint8_t _verbose);
 
 	void openConnection();
 	void closeConnection();

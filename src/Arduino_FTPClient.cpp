@@ -61,6 +61,10 @@ void Arduino_FTPClient::setTimeout(uint16_t _timeout) {
 	this->timeout = _timeout;
 }
 
+void Arduino_FTPClient::setVerbose(uint8_t _verbose) {
+	this->verbose = _verbose;
+}
+
 Client *Arduino_FTPClient::getDataClient() {
 	return dclient;
 }
