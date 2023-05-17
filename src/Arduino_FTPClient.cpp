@@ -59,6 +59,7 @@ void Arduino_FTPClient::setAccount(String _userName, String _password) {
 
 void Arduino_FTPClient::setTimeout(uint16_t _timeout) {
 	this->timeout = _timeout;
+	this->client->setTimeout(_timeout);
 }
 
 void Arduino_FTPClient::setVerbose(uint8_t _verbose) {
