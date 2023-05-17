@@ -83,7 +83,7 @@ public:
 	void getFileStatus(const char *fpath);
 	void getFileStatus(const char *fpath, String *result);
 	uint16_t getLastResponseCode();
-	void clearBuffer();
+	void clearBuffer(bool debug = false);
 };
 
 #endif /* ARDUINO_FTP_CLIENT_H */

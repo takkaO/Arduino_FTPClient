@@ -6,21 +6,21 @@ Arduino_FTPClient::Arduino_FTPClient() {
 }
 
 Arduino_FTPClient::Arduino_FTPClient(char *_serverAddress, uint16_t _port, char *_userName, char *_passWord, uint16_t _timeout, uint8_t _verbose) {
-	userName     = _userName;
-	passWord     = _passWord;
+	userName      = _userName;
+	passWord      = _passWord;
 	serverAddress = _serverAddress;
-	port         = _port;
-	timeout      = _timeout;
-	verbose      = _verbose;
+	port          = _port;
+	timeout       = _timeout;
+	verbose       = _verbose;
 }
 
 Arduino_FTPClient::Arduino_FTPClient(char *_serverAddress, char *_userName, char *_passWord, uint16_t _timeout, uint8_t _verbose) {
-	userName     = _userName;
-	passWord     = _passWord;
+	userName      = _userName;
+	passWord      = _passWord;
 	serverAddress = _serverAddress;
-	port         = 21;
-	timeout      = _timeout;
-	verbose      = _verbose;
+	port          = 21;
+	timeout       = _timeout;
+	verbose       = _verbose;
 }
 
 void Arduino_FTPClient::setClient(Client &_client) {
@@ -77,16 +77,18 @@ bool Arduino_FTPClient::isConnected() {
 
 void Arduino_FTPClient::getLastModifiedTime(const char *fileName, char *result) {
 	FTPdbgn("Send MDTM");
-	if (!isConnected())
+	if (!isConnected()) {
 		return;
+	}
 	client->print(F("MDTM "));
 	client->println(F(fileName));
 	getFTPAnswer(result, 4);
 }
 
 void Arduino_FTPClient::writeClientBuffered(Client *cli, unsigned char *data, int dataLength) {
-	if (!isConnected())
+	if (!isConnected()) {
 		return;
+	}
 
 	size_t clientCount = 0;
 	for (int i = 0; i < dataLength; i++) {
@@ -107,8 +109,9 @@ void Arduino_FTPClient::getFTPAnswer(char *result, int offsetStart) {
 	char thisByte;
 
 	unsigned long _m = millis();
-	while (!client->available() && millis() < _m + timeout)
+	while (!client->available() && millis() < _m + timeout) {
 		delay(1);
+	}
 
 	if (!client->available()) {
 		outCount = 0;
@@ -157,8 +160,9 @@ void Arduino_FTPClient::getFTPAnswer(char *result, int offsetStart) {
 
 void Arduino_FTPClient::writeData(unsigned char *data, int dataLength) {
 	FTPdbgn(F("Writing"));
-	if (!isConnected())
+	if (!isConnected()) {
 		return;
+	}
 	writeClientBuffered(dclient, &data[0], dataLength);
 }
 
@@ -166,16 +170,18 @@ void Arduino_FTPClient::closeFile() {
 	FTPdbgn(F("Close File"));
 	dclient->stop();
 
-	if (!_isConnected)
+	if (!_isConnected) {
 		return;
+	}
 
 	getFTPAnswer();
 }
 
 void Arduino_FTPClient::write(const char *str) {
 	FTPdbgn(F("Write File"));
-	if (!isConnected())
+	if (!isConnected()) {
 		return;
+	}
 
 	getDataClient()->print(str);
 }
@@ -224,8 +230,9 @@ void Arduino_FTPClient::openConnection() {
 
 void Arduino_FTPClient::renameFile(const char *from, const char *to) {
 	FTPdbgn("Send RNFR");
-	if (!isConnected())
+	if (!isConnected()) {
 		return;
+	}
 	client->print(F("RNFR "));
 	client->println(F(from));
 	getFTPAnswer();
@@ -238,8 +245,9 @@ void Arduino_FTPClient::renameFile(const char *from, const char *to) {
 
 void Arduino_FTPClient::newFile(const char *fileName) {
 	FTPdbgn("Send STOR");
-	if (!isConnected())
+	if (!isConnected()) {
 		return;
+	}
 	client->print(F("STOR "));
 	client->println(F(fileName));
 	getFTPAnswer();
@@ -247,8 +255,9 @@ void Arduino_FTPClient::newFile(const char *fileName) {
 
 void Arduino_FTPClient::initFile(const char *type) {
 	FTPdbgn("Send TYPE");
-	if (!isConnected())
+	if (!isConnected()) {
 		return;
+	}
 	FTPdbgn(type);
 	client->println(F(type));
 	getFTPAnswer();
@@ -288,8 +297,9 @@ void Arduino_FTPClient::initFile(const char *type) {
 
 void Arduino_FTPClient::appendFile(char *fileName) {
 	FTPdbgn("Send APPE");
-	if (!isConnected())
+	if (!isConnected()) {
 		return;
+	}
 	client->print(F("APPE "));
 	client->println(F(fileName));
 	getFTPAnswer();
@@ -297,8 +307,9 @@ void Arduino_FTPClient::appendFile(char *fileName) {
 
 void Arduino_FTPClient::changeWorkDir(const char *dir) {
 	FTPdbgn("Send CWD");
-	if (!isConnected())
+	if (!isConnected()) {
 		return;
+	}
 	client->print(F("CWD "));
 	client->println(F(dir));
 	getFTPAnswer();
@@ -306,8 +317,9 @@ void Arduino_FTPClient::changeWorkDir(const char *dir) {
 
 void Arduino_FTPClient::deleteFile(const char *file) {
 	FTPdbgn("Send DELE");
-	if (!isConnected())
+	if (!isConnected()) {
 		return;
+	}
 	client->print(F("DELE "));
 	client->println(F(file));
 	getFTPAnswer();
@@ -315,8 +327,9 @@ void Arduino_FTPClient::deleteFile(const char *file) {
 
 void Arduino_FTPClient::makeDir(const char *dir) {
 	FTPdbgn("Send MKD");
-	if (!isConnected())
+	if (!isConnected()) {
 		return;
+	}
 	client->print(F("MKD "));
 	client->println(F(dir));
 	getFTPAnswer();
@@ -327,8 +340,9 @@ void Arduino_FTPClient::contentList(const char *dir, String *list) {
 	uint16_t _b = 0;
 
 	FTPdbgn("Send MLSD");
-	if (!isConnected())
+	if (!isConnected()) {
 		return;
+	}
 	client->print(F("MLSD"));
 	client->println(F(dir));
 	getFTPAnswer(_resp);
@@ -340,8 +354,9 @@ void Arduino_FTPClient::contentList(const char *dir, String *list) {
 	// FTPdbgn(resp_string);
 
 	unsigned long _m = millis();
-	while (!dclient->available() && millis() < _m + timeout)
+	while (!dclient->available() && millis() < _m + timeout) {
 		delay(1);
+	}
 
 	while (dclient->available()) {
 		if (_b < 128) {
@@ -350,9 +365,12 @@ void Arduino_FTPClient::contentList(const char *dir, String *list) {
 			_b++;
 		} else {
 			// too many files
-			return;
+			break;
+			;
 		}
 	}
+
+	clearBuffer(false);
 }
 
 void Arduino_FTPClient::contentListWithListCommand(const char *dir, String *list) {
@@ -360,8 +378,9 @@ void Arduino_FTPClient::contentListWithListCommand(const char *dir, String *list
 	uint16_t _b = 0;
 
 	FTPdbgn("Send LIST");
-	if (!isConnected())
+	if (!isConnected()) {
 		return;
+	}
 	client->print(F("LIST"));
 	client->println(F(dir));
 	getFTPAnswer(_resp);
@@ -373,8 +392,9 @@ void Arduino_FTPClient::contentListWithListCommand(const char *dir, String *list
 	// FTPdbgn(resp_string);
 
 	unsigned long _m = millis();
-	while (!dclient->available() && millis() < _m + timeout)
+	while (!dclient->available() && millis() < _m + timeout) {
 		delay(1);
+	}
 
 	while (dclient->available()) {
 		if (_b < 128) {
@@ -384,15 +404,19 @@ void Arduino_FTPClient::contentListWithListCommand(const char *dir, String *list
 			_b++;
 		} else {
 			// too many files
-			return;
+			break;
 		}
 	}
+
+	clearBuffer(false);
 }
 
 void Arduino_FTPClient::downloadString(const char *filename, String &str) {
 	FTPdbgn("Send RETR");
-	if (!isConnected())
+	if (!isConnected()) {
 		return;
+	}
+
 	client->print(F("RETR "));
 	client->println(F(filename));
 
@@ -400,8 +424,9 @@ void Arduino_FTPClient::downloadString(const char *filename, String &str) {
 	getFTPAnswer(_resp);
 
 	unsigned long _m = millis();
-	while (!getDataClient()->available() && millis() < _m + timeout)
+	while (!getDataClient()->available() && millis() < _m + timeout) {
 		delay(1);
+	}
 
 	while (getDataClient()->available()) {
 		str += getDataClient()->readString();
@@ -410,8 +435,9 @@ void Arduino_FTPClient::downloadString(const char *filename, String &str) {
 
 void Arduino_FTPClient::downloadFile(const char *filename, unsigned char *buf, size_t length, bool printUART) {
 	FTPdbgn("Send RETR");
-	if (!isConnected())
+	if (!isConnected()) {
 		return;
+	}
 	client->print(F("RETR "));
 	client->println(F(filename));
 
@@ -421,14 +447,14 @@ void Arduino_FTPClient::downloadFile(const char *filename, unsigned char *buf, s
 	char _buf[2];
 
 	unsigned long _m = millis();
-	while (!dclient->available() && millis() < _m + timeout)
+	while (!dclient->available() && millis() < _m + timeout) {
 		delay(1);
+	}
 
 	while (dclient->available()) {
-		if (!printUART)
+		if (!printUART) {
 			dclient->readBytes(buf, length);
-
-		else {
+		} else {
 			for (size_t _b = 0; _b < length; _b++) {
 				dclient->readBytes(_buf, 1),
 				    Serial.print(_buf[0], HEX);
@@ -445,8 +471,9 @@ void Arduino_FTPClient::getFileStatus(const char *fpath) {
 
 void Arduino_FTPClient::getFileStatus(const char *fpath, String *result) {
 	FTPdbgn("Send STAT");
-	if (!isConnected())
+	if (!isConnected()) {
 		return;
+	}
 	client->print(F("STAT "));
 	client->println(F(fpath));
 
@@ -481,8 +508,14 @@ uint16_t Arduino_FTPClient::getLastResponseCode() {
 	return _lastResponseCode;
 }
 
-void Arduino_FTPClient::clearBuffer() {
-	while (client->available()) {
-		Serial.println(client->read());
+void Arduino_FTPClient::clearBuffer(bool debug) {
+	if (debug) {
+		while (client->available()) {
+			Serial.printf("%c", client->read());
+		}
+	} else {
+		while (client->available()) {
+			client->flush();
+		}
 	}
 }

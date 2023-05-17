@@ -46,17 +46,18 @@ void setup() {
 	ftp.openConnection();
 
 	// Get directory content
-	// ftp.initFile("Type A");
-	// String list[128];
-	// ftp.changeWorkDir("/public_html/zyro/gallery_gen/");
-	// ftp.contentList("", list);
-	// Serial.println("\nDirectory info: ");
-	// for (int i = 0; i < sizeof(list); i++) {
-	// 	if (list[i].length() > 0)
-	// 		Serial.println(list[i]);
-	// 	else
-	// 		break;
-	// }
+	ftp.initFile("Type A");
+	String list[128];
+	ftp.changeWorkDir("/public_html/zyro/gallery_gen/");
+	ftp.contentList("", list);
+	//ftp.contentListWithListCommand("", list);
+	Serial.println("\nDirectory info: ");
+	for (int i = 0; i < sizeof(list); i++) {
+		if (list[i].length() > 0)
+			Serial.println(list[i]);
+		else
+			break;
+	}
 
 	// Make a new directory
 	ftp.initFile("Type A");
